@@ -1,0 +1,11 @@
+# Profil de production : la clé de signature doit être fournie par un gestionnaire de secrets.
+app:
+  security:
+    jwt:
+      require-secret: true
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false

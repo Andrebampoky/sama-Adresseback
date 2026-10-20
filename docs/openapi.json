@@ -1,0 +1,2053 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "SamaAdresse API",
+        "description": "API REST SamaAdresse : comptes, adresses du propri\u00e9taire, mod\u00e9ration et consultation publique.",
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Generated server url"
+        }
+    ],
+    "paths": {
+        "/api/v1/me/addresses/{id}": {
+            "get": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Consulter une de mes adresses",
+                "operationId": "get",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Modifier le contenu et la visibilit\u00e9 d'une de mes adresses",
+                "description": "Position, ville et quartier non modifiables (ils d\u00e9terminent le code). Une adresse d\u00e9j\u00e0 valid\u00e9e ou rejet\u00e9e repasse en v\u00e9rification si son contenu change. 409 si archiv\u00e9e.",
+                "operationId": "update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAddressRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/addresses/{id}/photo": {
+            "get": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Voir la photo de fa\u00e7ade d'une de mes adresses",
+                "operationId": "getPhoto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo JPEG r\u00e9encod\u00e9e par le serveur",
+                        "content": {
+                            "image/jpeg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Adresse introuvable ou sans photo",
+                        "content": {
+                            "application/problem+json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Ajouter ou remplacer la photo de fa\u00e7ade (JPEG/PNG, 5 Mo max, pendant la v\u00e9rification)",
+                "operationId": "putPhoto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Retirer la photo de fa\u00e7ade",
+                "operationId": "deletePhoto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/addresses/{id}/location": {
+            "put": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Corriger la position d'une adresse en attente de v\u00e9rification (le code est recalcul\u00e9)",
+                "description": "409 si l'adresse a d\u00e9j\u00e0 \u00e9t\u00e9 valid\u00e9e, rejet\u00e9e ou archiv\u00e9e ; 400 hors zone de service.",
+                "operationId": "relocate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RelocateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/addresses": {
+            "get": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Lister mes adresses, les plus r\u00e9centes d'abord",
+                "operationId": "list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseOwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Cr\u00e9er une adresse (statut initial PENDING_VALIDATION, code attribu\u00e9 par le serveur)",
+                "operationId": "create",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAddressRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/addresses/{id}/sms": {
+            "post": {
+                "tags": [
+                    "Partage"
+                ],
+                "summary": "Envoyer par SMS le lien de la fiche publique d'une de mes adresses",
+                "description": "503 si aucun fournisseur n'est configur\u00e9 ; 409 si l'adresse n'est pas publique ; 429 au-del\u00e0 de 5 envois par heure. status=SIMULATED signifie qu'aucun SMS n'a \u00e9t\u00e9 envoy\u00e9.",
+                "operationId": "send",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SmsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/addresses/{id}/archive": {
+            "post": {
+                "tags": [
+                    "Mes adresses"
+                ],
+                "summary": "Archiver d\u00e9finitivement une de mes adresses (elle n'est plus publique)",
+                "operationId": "archive",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Cr\u00e9er un compte utilisateur (r\u00f4le USER)",
+                "operationId": "register",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Se connecter et obtenir un jeton d'acc\u00e8s",
+                "operationId": "login",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/users/{id}/enable": {
+            "post": {
+                "tags": [
+                    "Administration \u2014 indicateurs et comptes"
+                ],
+                "summary": "R\u00e9activer un compte (ADMIN)",
+                "operationId": "enable",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users/{id}/disable": {
+            "post": {
+                "tags": [
+                    "Administration \u2014 indicateurs et comptes"
+                ],
+                "summary": "D\u00e9sactiver un compte (ADMIN). Impossible sur son propre compte ou un autre administrateur.",
+                "operationId": "disable",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/reports/{id}/dismiss": {
+            "post": {
+                "tags": [
+                    "Signalements"
+                ],
+                "summary": "\u00c9carter un signalement : l'adresse reste en ligne (ADMIN)",
+                "operationId": "dismiss",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/reports/{id}/archive-address": {
+            "post": {
+                "tags": [
+                    "Signalements"
+                ],
+                "summary": "Signalement fond\u00e9 : archiver l'adresse et clore ses signalements (ADMIN)",
+                "operationId": "archiveAddress",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/addresses/{id}/validate": {
+            "post": {
+                "tags": [
+                    "Administration \u2014 adresses"
+                ],
+                "summary": "Valider une adresse en attente",
+                "operationId": "validate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/addresses/{id}/reject": {
+            "post": {
+                "tags": [
+                    "Administration \u2014 adresses"
+                ],
+                "summary": "Rejeter une adresse en attente",
+                "operationId": "reject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/addresses/{code}/reports": {
+            "post": {
+                "tags": [
+                    "Signalements"
+                ],
+                "summary": "Signaler une adresse publique (utilisateur connect\u00e9)",
+                "description": "404 si l'adresse n'est pas publique ; 409 si vous avez d\u00e9j\u00e0 un signalement ouvert ; 400 pour votre propre adresse.",
+                "operationId": "report",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportCreated"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/routes": {
+            "get": {
+                "tags": [
+                    "Itin\u00e9raire"
+                ],
+                "summary": "Itin\u00e9raire vers une adresse publique (OpenRouteService, ou OSRM sans cl\u00e9)",
+                "description": "503 si aucun service n'est disponible ; 429 si le quota est atteint ; 422 si aucun itin\u00e9raire n'existe ; 502/504 si le service est indisponible.",
+                "operationId": "route",
+                "parameters": [
+                    {
+                        "name": "fromLat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    {
+                        "name": "fromLng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    {
+                        "name": "toCode",
+                        "in": "query",
+                        "description": "Code de l'adresse publique de destination",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "profile",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "foot-walking"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RouteResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "health-controller"
+                ],
+                "operationId": "health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Compte actuellement connect\u00e9",
+                "operationId": "me",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users": {
+            "get": {
+                "tags": [
+                    "Administration \u2014 indicateurs et comptes"
+                ],
+                "summary": "Comptes, les plus r\u00e9cents d'abord (ADMIN)",
+                "operationId": "users",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseUserSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/stats": {
+            "get": {
+                "tags": [
+                    "Administration \u2014 indicateurs et comptes"
+                ],
+                "summary": "Indicateurs exacts calcul\u00e9s en base (compteurs, r\u00e9partition, 12 derniers mois)",
+                "operationId": "stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Stats"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/reports": {
+            "get": {
+                "tags": [
+                    "Signalements"
+                ],
+                "summary": "Lister les signalements par statut (ADMIN), les plus anciens d'abord",
+                "operationId": "list_1",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "OPEN",
+                            "enum": [
+                                "OPEN",
+                                "DISMISSED",
+                                "ACTION_TAKEN"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseReportResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/addresses": {
+            "get": {
+                "tags": [
+                    "Administration \u2014 adresses"
+                ],
+                "summary": "Lister les adresses par statut (par d\u00e9faut : en attente)",
+                "operationId": "list_2",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "PENDING_VALIDATION",
+                            "enum": [
+                                "PENDING_VALIDATION",
+                                "VALIDATED",
+                                "REJECTED",
+                                "ARCHIVED"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseOwnerAddressResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/addresses/{id}/photo": {
+            "get": {
+                "tags": [
+                    "Administration \u2014 adresses"
+                ],
+                "summary": "Voir la photo de fa\u00e7ade d'une adresse \u00e0 mod\u00e9rer",
+                "operationId": "photo",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo JPEG r\u00e9encod\u00e9e par le serveur",
+                        "content": {
+                            "image/jpeg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Adresse introuvable ou sans photo",
+                        "content": {
+                            "application/problem+json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/addresses": {
+            "get": {
+                "tags": [
+                    "Adresses publiques"
+                ],
+                "summary": "Annuaire public : recherche par code, nom du propri\u00e9taire, quartier, ville et type",
+                "description": "Seules les adresses valid\u00e9es et publi\u00e9es sont renvoy\u00e9es. Le nom du propri\u00e9taire n'est cherch\u00e9 et affich\u00e9 que s'il l'a autoris\u00e9. Pagination : size 1 \u00e0 50 (20 par d\u00e9faut).",
+                "operationId": "search",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Texte libre : nom du lieu, quartier, ville, code ou propri\u00e9taire",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "D\u00e9but du code, ex. ZIG-KAN",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "owner",
+                        "in": "query",
+                        "description": "Nom du propri\u00e9taire",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "district",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "HOUSE",
+                                "BUSINESS",
+                                "INSTITUTION",
+                                "OTHER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page de r\u00e9sultats (\u00e9ventuellement vide)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseAddressPublicResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Crit\u00e8re invalide (trop long, type inconnu)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseAddressPublicResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/addresses/{code}": {
+            "get": {
+                "tags": [
+                    "Adresses publiques"
+                ],
+                "summary": "Retrouver une adresse publique valid\u00e9e par son code",
+                "operationId": "findByCode",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Code d'adresse, par exemple ZIG-KBG-4271",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Adresse trouv\u00e9e",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AddressPublicResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Format de code invalide",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AddressPublicResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Adresse absente ou non publi\u00e9e",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AddressPublicResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/addresses/{code}/photo": {
+            "get": {
+                "tags": [
+                    "Adresses publiques"
+                ],
+                "summary": "Photo de fa\u00e7ade d'une adresse publique valid\u00e9e",
+                "operationId": "photo_1",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo JPEG r\u00e9encod\u00e9e par le serveur",
+                        "content": {
+                            "image/jpeg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Adresse non publique ou sans photo",
+                        "content": {
+                            "application/problem+json": {}
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "UpdateAddressRequest": {
+                "required": [
+                    "placeType",
+                    "publicationConsent",
+                    "title"
+                ],
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "maxLength": 160,
+                        "minLength": 2,
+                        "type": "string"
+                    },
+                    "placeType": {
+                        "type": "string",
+                        "enum": [
+                            "HOUSE",
+                            "BUSINESS",
+                            "INSTITUTION",
+                            "OTHER"
+                        ]
+                    },
+                    "description": {
+                        "maxLength": 1000,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "publicationConsent": {
+                        "type": "boolean"
+                    },
+                    "ownerNamePublic": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "OwnerAddressResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "publicCode": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "placeType": {
+                        "type": "string",
+                        "enum": [
+                            "HOUSE",
+                            "BUSINESS",
+                            "INSTITUTION",
+                            "OTHER"
+                        ]
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING_VALIDATION",
+                            "VALIDATED",
+                            "REJECTED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "publicationConsent": {
+                        "type": "boolean"
+                    },
+                    "publiclyAccessible": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "moderatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "hasPhoto": {
+                        "type": "boolean"
+                    },
+                    "ownerNamePublic": {
+                        "type": "boolean"
+                    }
+                },
+                "description": "Adresse vue par son propri\u00e9taire (ou un administrateur)."
+            },
+            "RelocateRequest": {
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "maximum": 90,
+                        "exclusiveMaximum": false,
+                        "minimum": -90,
+                        "exclusiveMinimum": false,
+                        "type": "number"
+                    },
+                    "longitude": {
+                        "maximum": 180,
+                        "exclusiveMaximum": false,
+                        "minimum": -180,
+                        "exclusiveMinimum": false,
+                        "type": "number"
+                    }
+                }
+            },
+            "CreateAddressRequest": {
+                "required": [
+                    "city",
+                    "district",
+                    "latitude",
+                    "longitude",
+                    "placeType",
+                    "publicationConsent",
+                    "title"
+                ],
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "maxLength": 160,
+                        "minLength": 2,
+                        "type": "string"
+                    },
+                    "placeType": {
+                        "type": "string",
+                        "enum": [
+                            "HOUSE",
+                            "BUSINESS",
+                            "INSTITUTION",
+                            "OTHER"
+                        ]
+                    },
+                    "district": {
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "type": "string"
+                    },
+                    "city": {
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "type": "string"
+                    },
+                    "description": {
+                        "maxLength": 1000,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "maximum": 90,
+                        "exclusiveMaximum": false,
+                        "minimum": -90,
+                        "exclusiveMinimum": false,
+                        "type": "number"
+                    },
+                    "longitude": {
+                        "maximum": 180,
+                        "exclusiveMaximum": false,
+                        "minimum": -180,
+                        "exclusiveMinimum": false,
+                        "type": "number"
+                    },
+                    "publicationConsent": {
+                        "type": "boolean"
+                    },
+                    "ownerNamePublic": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "SmsRequest": {
+                "required": [
+                    "phone"
+                ],
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                }
+            },
+            "SmsResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "SENT",
+                            "SIMULATED"
+                        ]
+                    },
+                    "provider": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string"
+                    },
+                    "link": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RegisterRequest": {
+                "required": [
+                    "displayName",
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "maxLength": 254,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "password": {
+                        "maxLength": 72,
+                        "minLength": 10,
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "maxLength": 80,
+                        "minLength": 2,
+                        "type": "string"
+                    }
+                }
+            },
+            "AuthResponse": {
+                "type": "object",
+                "properties": {
+                    "accessToken": {
+                        "type": "string"
+                    },
+                    "tokenType": {
+                        "type": "string"
+                    },
+                    "expiresAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    }
+                }
+            },
+            "UserResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "USER",
+                            "ADMIN"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "description": "Compte authentifi\u00e9. Le hachage du mot de passe n'est jamais renvoy\u00e9."
+            },
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "maxLength": 254,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "password": {
+                        "maxLength": 200,
+                        "minLength": 0,
+                        "type": "string"
+                    }
+                }
+            },
+            "UserSummary": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "USER",
+                            "ADMIN"
+                        ]
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "addressCount": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "ReportResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "enum": [
+                            "WRONG_LOCATION",
+                            "NOT_EXISTING",
+                            "INAPPROPRIATE",
+                            "DUPLICATE",
+                            "OTHER"
+                        ]
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "OPEN",
+                            "DISMISSED",
+                            "ACTION_TAKEN"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "resolvedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "reporterName": {
+                        "type": "string"
+                    },
+                    "addressId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "publicCode": {
+                        "type": "string"
+                    },
+                    "addressTitle": {
+                        "type": "string"
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "addressStatus": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING_VALIDATION",
+                            "VALIDATED",
+                            "REJECTED",
+                            "ARCHIVED"
+                        ]
+                    }
+                },
+                "description": "Signalement vu par un administrateur."
+            },
+            "CreateReportRequest": {
+                "required": [
+                    "reason"
+                ],
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "enum": [
+                            "WRONG_LOCATION",
+                            "NOT_EXISTING",
+                            "INAPPROPRIATE",
+                            "DUPLICATE",
+                            "OTHER"
+                        ]
+                    },
+                    "comment": {
+                        "maxLength": 500,
+                        "minLength": 0,
+                        "type": "string"
+                    }
+                }
+            },
+            "ReportCreated": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "OPEN",
+                            "DISMISSED",
+                            "ACTION_TAKEN"
+                        ]
+                    }
+                }
+            },
+            "RouteResponse": {
+                "type": "object",
+                "properties": {
+                    "profile": {
+                        "type": "string"
+                    },
+                    "distanceMeters": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "durationSeconds": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "coordinates": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        }
+                    },
+                    "provider": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PageResponseOwnerAddressResponse": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OwnerAddressResponse"
+                        }
+                    },
+                    "page": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "HealthResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "database": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PageResponseUserSummary": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserSummary"
+                        }
+                    },
+                    "page": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "MonthlyCount": {
+                "type": "object",
+                "properties": {
+                    "month": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "byType": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                }
+            },
+            "Stats": {
+                "type": "object",
+                "properties": {
+                    "totalAddresses": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "byStatus": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    "byType": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    "publicAddresses": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "openReports": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "users": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "activeUsers": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "monthly": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MonthlyCount"
+                        }
+                    }
+                }
+            },
+            "PageResponseReportResponse": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportResponse"
+                        }
+                    },
+                    "page": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "AddressPublicResponse": {
+                "type": "object",
+                "properties": {
+                    "publicCode": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "placeType": {
+                        "type": "string",
+                        "enum": [
+                            "HOUSE",
+                            "BUSINESS",
+                            "INSTITUTION",
+                            "OTHER"
+                        ]
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "photoUrl": {
+                        "type": "string"
+                    },
+                    "ownerName": {
+                        "type": "string",
+                        "description": "Nom affich\u00e9 du propri\u00e9taire, seulement s'il a accept\u00e9 de figurer dans l'annuaire"
+                    }
+                },
+                "description": "Informations explicitement publiques d'une adresse valid\u00e9e."
+            },
+            "PageResponseAddressPublicResponse": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AddressPublicResponse"
+                        }
+                    },
+                    "page": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearer": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
